@@ -1,70 +1,60 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import Task from '@/components/tasks/Task';
+import { useState } from 'react';
+import {View , Text, TextInput, Button, Alert, ScrollView} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+interface TaskContains {
+  name: string
+  date: string
+  complete: boolean
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+
+
+export default function HomeScreen() {
+  const [tasks, setTasks] = useState<TaskContains[]>([])
+  const [input , setInput] = useState('')
+
+
+      function addTask(date: Date){
+      if(input.length !== 0)
+        {
+          setTasks([
+            ...tasks,
+            {name: input , date: `the time created at ${date.getHours()}${date.getHours() >= 12 ? 'PM' : 'AM'} :${date.getMinutes()}` , complete: false}
+            ]
+          )
+          Alert.alert('the task has been added', `the task is '${input}'`);
+          setInput('')
+        } else {
+          Alert.alert("You can't add empty task");
+        }
+      }
+
+      function toggling(id: number){
+        setTasks(tasks.map((task ,index) => (id == index ? {...task, complete: !task.complete } : task)))
+      }
+
+
+
+  return (
+      <View style={{flex: 1, backgroundColor: '#111f1f'}}>
+        <SafeAreaView style={{gap:12}} >
+            <Text style={{color: '#ffffff', alignSelf: 'center', marginTop: 20, fontSize:24, marginBottom:20, fontWeight:'bold'}}>Welcome to Todo</Text>
+            <View style={{flexDirection: 'row' }}>
+              <TextInput style={{padding: 15, borderWidth:2, marginHorizontal: 30, borderColor: 'white', color: 'white', flex:1,}} value={input} onChangeText={setInput} placeholder='Your Task ...' placeholderTextColor={'white'}/>
+              <Button  title='Press' color={"#1f2151"}  onPress={() => {addTask(new Date())}}/>
+            </View>
+            <ScrollView  style={{marginTop:'10%', marginBottom: '35%' }}>
+              {
+                tasks.map((val , index) => {
+                  return(
+                    <Task data={val.name} date={val.date} complete={val.complete} toggle={toggling} id={index} key={index}/>
+                  )
+                })
+              }
+            </ScrollView>
+        </SafeAreaView>
+      </View>
+  );
+}

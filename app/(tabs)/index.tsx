@@ -1,6 +1,6 @@
 import Task from '@/components/tasks/Task';
 import { useState } from 'react';
-import {View , Text, TextInput, Button, Alert, ScrollView} from 'react-native';
+import {View , Text, TextInput, TouchableOpacity, Alert, ScrollView} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface TaskContains {
@@ -35,21 +35,35 @@ export default function HomeScreen() {
         setTasks(tasks.map((task ,index) => (id == index ? {...task, complete: !task.complete } : task)))
       }
 
+      function handleDelete(id: number){
+        setTasks(tasks.filter((task, index) => index !== id));
+      }
+
 
 
   return (
       <View style={{flex: 1, backgroundColor: '#111f1f'}}>
         <SafeAreaView style={{gap:12}} >
-            <Text style={{color: '#ffffff', alignSelf: 'center', marginTop: 20, fontSize:24, marginBottom:20, fontWeight:'bold'}}>Welcome to Todo</Text>
-            <View style={{flexDirection: 'row' }}>
-              <TextInput style={{padding: 15, borderWidth:2, marginHorizontal: 30, borderColor: 'white', color: 'white', flex:1,}} value={input} onChangeText={setInput} placeholder='Your Task ...' placeholderTextColor={'white'}/>
-              <Button  title='Press' color={"#1f2151"}  onPress={() => {addTask(new Date())}}/>
+            <Text style={{color: '#ffffff', alignSelf: 'center', marginTop: 30, fontSize:24, marginBottom:40, fontWeight:'bold'}}>Welcome to Todo</Text>
+            <View style={{flexDirection: 'row',  marginHorizontal: 30, gap:15}}>
+              <TextInput 
+              style={{padding: 15, borderWidth:2, borderColor: 'white', color: 'white', flex:1, borderRadius:10, fontSize:19}} 
+              value={input} 
+              onChangeText={setInput} 
+              placeholder='Your Task ...' 
+              placeholderTextColor={'white'}/>
+              <TouchableOpacity 
+              style={{backgroundColor: '#1f2151', padding:20, borderRadius:10}}
+              onPress={() => {addTask(new Date())}}
+              >
+                <Text style={{color: 'white'}}>Press</Text>
+              </TouchableOpacity>
             </View>
-            <ScrollView  style={{marginTop:'10%', marginBottom: '35%' }}>
+            <ScrollView  style={{marginTop:'10%', marginBottom: '50%' }}>
               {
                 tasks.map((val , index) => {
                   return(
-                    <Task data={val.name} date={val.date} complete={val.complete} toggle={toggling} id={index} key={index}/>
+                    <Task data={val.name} date={val.date} complete={val.complete} onToggle={toggling} onDelete={handleDelete} id={index} key={index}/>
                   )
                 })
               }
